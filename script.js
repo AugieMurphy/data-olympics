@@ -1,52 +1,69 @@
-switchB = document.getElementById("switch");
+var svgC = document.getElementById("svgc");
+var switchB = document.getElementById("switch");
+var titel = d3.select("#titel");
+var status = 0;
 
-var status = "OAR";
+var Switzerland = [5, 4, 6];
+var OAR = [2, 6, 9];
 
-Switzerland = [5,4,6];
-OAR = [2,6,9];
+var createCircles = function () {
+    for (var i = 0; i < 3; i++) {
+        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttributeNS(null, "cx", (1280 * (i + 1)) / 4);
+        circle.setAttributeNS(null, "cy", (720 / 2));
+        switch(i) {
+            case 0:
+                circle.setAttributeNS(null, "fill", "#FFD700");
+                break;
+            case 1:
+                circle.setAttributeNS(null, "fill", "#C0C0C0");
+                break;
+            case 2:
+                circle.setAttributeNS(null, "fill", "#8C7853");
+                break;
+        }
+        svgC.appendChild(circle);
+    }
+};
 
-var dataset = [2,6,9];
+createCircles();
 
-var body = d3.select("body");
+var changeTitel = function() {
+    switch(status) {
+        case "0":
+            titel.html("data olympics!!! for Switzerland");
+            break;
+        case "1":
+            titel.html("data olympics!!! for Olympic Athlete from Russia");
+            break;
+    }
+};
 
-var svg = body.append("svg")
-    .attr("width",750)
-    .attr("height",2800)
-    .style("border-style","solid")
-    .style("border-width","5px");
+var circles = d3.selectAll("circle");
 
-var circles = svg.selectAll("circle")
-    .data(OAR)
-    .enter()
-    .append("circle")
+circles.data(Switzerland);
 
-var display = function(){
-    return circles.attr("cx", function(n,i){ return 200*(i+1); })
-    .attr("cy",250)
-    .attr("r", function(n){ return n*10; })
-    .style("fill", function(n,i){
-	if( i === 0 ){ return "#FFD700"; }
-	else if( i === 1 ){ return  "#C0C0C0"; }
-	else if( i === 2 ){ return "#8C7853"; }
+var changeData = function () {
+    circles.attr("r", function (d) {
+        return d * 10;
     });
-}
+};
 
-display();
-
-var react = function(){
-    if( status == "OAR" ){
-	status = "Switzerland";
-	svg.selectAll("circle")
-	    .data(Switzerland)
-	    .enter();
+var pressToggle = function () {
+    switch(status) {
+        case "0":
+            circles.data(OAR);
+            status = 1;
+            break;
+        case "1":
+            circles.data(Switzerland);
+            status = 0;
+            break;
     }
-    else{
-	status = "OAR";
-	svg.selectAll("circle")
-	    .data(OAR)
-	    .enter();
-    }
-    display();
-}
+    changeTitel();
+    changeData();
+};
 
-switchB.addEventListener("click",react);
+pressToggle();
+
+switchB.addEventListener("click", pressToggle);
